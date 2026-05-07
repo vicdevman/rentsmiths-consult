@@ -106,7 +106,7 @@ export function Header() {
             data-cursor="interactive"
             data-cursor-scale="2"
           >
-            Reachout
+            Let's Talk
             <ArrowUpRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
           </Link>
         </div>
@@ -146,7 +146,7 @@ export function Header() {
                     key={n.to}
                     href={n.to}
                     onClick={() => setOpen(false)}
-                    className={`block rounded-lg px-5 py-4 text-base font-medium ${isActive ? 'bg-primary text-primary-foreground' : 'hover:bg-cream-deep'}`}
+                    className={`block rounded-lg px-5 py-4 text-base font-medium ${isActive ? ' text-primary' : 'hover:bg-cream-deep'}`}
                     data-cursor="interactive"
                     data-cursor-scale="1.6"
                   >

@@ -72,7 +72,7 @@ export function Industries() {
               const c = palette[idx % palette.length];
               const classes = colorClasses[c] ?? 'bg-slate-500 text-white hover:bg-slate-600';
               return { label, className: `inline-flex items-center rounded-full px-5 py-3 text-sm font-medium transition-all whitespace-nowrap ${classes}` };
-            })}
+            }) as any}
             // highlightWords={[
             //   "React",
             //   "Bits",
