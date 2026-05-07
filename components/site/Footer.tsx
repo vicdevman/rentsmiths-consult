@@ -79,7 +79,16 @@ export default function Footer() {
 
         <div className="mt-16 flex flex-col items-start justify-between gap-3 border-t border-cream/10 pt-6 text-xs text-cream/60 sm:flex-row sm:items-center">
           <p>© {new Date().getFullYear()} Rentsmiths Global Consults. All rights reserved.</p>
-          <p>Crafted with care for ambitious futures.</p>
+          <div className="flex items-center gap-4">
+            <p>Crafted with care for ambitious futures.</p>
+            <Link
+              href="/login"
+              className="text-cream/20 transition-colors hover:text-cream/40"
+              aria-label="Admin"
+            >
+              Tope
+            </Link>
+          </div>
         </div>
       </div>
     </footer>

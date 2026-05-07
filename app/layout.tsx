@@ -1,11 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Inter } from "next/font/google";
 import "./globals.css";
-import { Header } from "@/components/site/Header";
-import CursorFollower from "@/components/ui/CursorFollower";
-import Footer from "@/components/site/Footer";
-import { Testimonials } from "@/components/site/Testimonials";
-import { CtaBand } from "@/components/site/CtaBand";
+import { SiteChrome } from "@/components/site/SiteChrome";
 import { cn } from "@/lib/utils";
 
 const inter = Inter({subsets:['latin'],variable:'--font-sans'});
@@ -40,14 +36,9 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300..700&display=swap" rel="stylesheet" />
       </head>
-      <Header/>
-      <body className="min-h-full flex flex-col">{children}
-        <CursorFollower />
+      <body className="min-h-full flex flex-col">
+        <SiteChrome>{children}</SiteChrome>
       </body>
-       <Testimonials />
-      <CtaBand />
-      <Footer/>
-      
     </html>
   );
 }
