@@ -18,7 +18,7 @@ export function Hero() {
   return (
     <section
       ref={ref}
-      className="relative isolate overflow-hidden pt-28 pb-24 sm:pt-36 sm:pb-32 "
+      className="relative isolate overflow-hidden pt-40 pb-16 sm:pt-48"
     >
       {/* Background image with parallax */}
       <motion.div style={{ y, scale }} className="absolute inset-0 -z-20">

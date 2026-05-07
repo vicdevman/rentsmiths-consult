@@ -11,6 +11,17 @@ const items = [
   "Architecture",
 ];
 
+const palette = [
+  "violet",
+  "emerald",
+  "teal",
+  "indigo",
+  "rose",
+  "amber",
+  "slate",
+  "sky",
+];
+
 export function Industries() {
   return (
     <section className="bg-cream-deep py-24 sm:py-32">
@@ -23,14 +34,18 @@ export function Industries() {
         </Reveal>
 
         <div className="mt-12 flex flex-wrap justify-center gap-3">
-          {items.map((i, idx) => (
-            <Reveal key={i} delay={idx * 0.04}>
-              <span className="inline-flex items-center gap-2 rounded-full border border-border bg-background px-5 py-3 text-sm font-medium transition-colors hover:bg-primary hover:text-primary-foreground hover:border-transparent">
-                <span className="h-1.5 w-1.5 rounded-full bg-primary" />
-                {i}
-              </span>
-            </Reveal>
-          ))}
+          {items.map((i, idx) => {
+            const c = palette[idx % palette.length];
+            return (
+              <Reveal key={i} delay={idx * 0.04}>
+                <span
+                  className={`inline-flex items-center gap-3 rounded-full border px-5 py-3 text-sm font-medium transition-all whitespace-nowrap bg-${c}-50 text-${c}-700 hover:bg-${c}-100`}
+                >
+                  {i}
+                </span>
+              </Reveal>
+            );
+          })}
         </div>
       </div>
     </section>
