@@ -42,7 +42,7 @@ export const services = [
 export function Services({ limit }: { limit?: number }) {
   const items = limit ? services.slice(0, limit) : services;
   return (
-    <section className="bg-cream-deep py-24 sm:py-32">
+    <section id="services" className="bg-cream-deep py-24 sm:py-32">
       <div className="container-x">
         <Reveal className="text-center">
           <span className="pill">Our services</span>

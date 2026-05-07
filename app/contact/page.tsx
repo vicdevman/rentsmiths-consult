@@ -26,7 +26,7 @@ export default function Contact() {
         <div className="grid gap-6 lg:grid-cols-[1fr_1.4fr]">
           {/* Info column */}
           <Reveal>
-            <div className="flex h-full flex-col justify-between rounded-3xl bg-ink p-8 text-cream">
+            <div className="flex h-full flex-col justify-between rounded-3xl bg-ink p-6 text-cream">
               <div>
                 <h2 className="font-display text-3xl">Get in touch directly</h2>
                 <ul className="mt-8 space-y-5 text-sm">
@@ -83,7 +83,7 @@ export default function Contact() {
                 e.preventDefault();
                 setSent(true);
               }}
-              className="rounded-3xl bg-background p-8 shadow-soft ring-1 ring-border"
+              className="rounded-3xl bg-background p-6 shadow-soft ring-1 ring-border"
             >
               <div className="grid gap-4 sm:grid-cols-2">
                 <Field label="Full name" name="name" placeholder="Jane Doe" />

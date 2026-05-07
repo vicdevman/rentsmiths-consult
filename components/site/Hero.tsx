@@ -5,6 +5,7 @@ import { ArrowUpRight, Star } from "lucide-react";
 import Link from "next/link";
 import { useRef } from "react";
 import heroBg from "@/assets/hero-bg.jpg";
+import CircularText from '../CircularText';
 
 export function Hero() {
   const ref = useRef<HTMLDivElement>(null);
@@ -34,7 +35,7 @@ export function Hero() {
         className="absolute inset-0"
         style={{
           background: "var(--cream)",
-          opacity: 0.98,
+          opacity: 0.92,
           zIndex: 0,
         }}
       />
@@ -48,7 +49,10 @@ export function Hero() {
       /> */}
 
       <div className="container-x relative z-10 text-center">
-        <h1 style={{ fontFamily: "var(--font-display)" }} className="mx-auto text-center max-w-4xl text-5xl leading-[1.02] sm:text-7xl lg:text-[5rem]">
+        <h1
+          style={{ fontFamily: "var(--font-display)" }}
+          className="mx-auto text-center max-w-4xl text-5xl leading-[1.02] sm:text-7xl lg:text-[5rem]"
+        >
           {"Your Gateway to Global Education & Careers."
             .split(" ")
             .map((w, i) => (
@@ -90,7 +94,7 @@ export function Hero() {
             data-cursor="interactive"
             data-cursor-scale="1.6"
           >
-            Get started now
+            Lets Talk
             <ArrowUpRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
           </Link>
           <Link
@@ -101,6 +105,25 @@ export function Hero() {
           >
             Explore services
           </Link>
+{/* <span className="fixed bottom-2 right-2">
+          <CircularText
+            text="EXPLORE*SERVICES*"
+            onHover="speedUp"
+            spinDuration={20}
+            className="text-primary z-1000"
+            // size={120}
+            // fontSize="1rem"
+            onClick={() => {
+              const el = document.getElementById('services');
+              if (el) {
+                el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+              } else {
+                // fallback: navigate to services page
+                window.location.href = '/services';
+              }
+            }}
+          />
+</span> */}
         </motion.div>
 
         {/* Floating stat card */}
