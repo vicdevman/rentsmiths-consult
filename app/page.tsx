@@ -6,8 +6,6 @@ import { Process } from "@/components/site/Process";
 import { BreakImage } from "@/components/site/BreakImage";
 import { Stats } from "@/components/site/Stats";
 import { Industries } from "@/components/site/Industries";
-import { Testimonials } from "@/components/site/Testimonials";
-import { CtaBand } from "@/components/site/CtaBand";
 
 
 

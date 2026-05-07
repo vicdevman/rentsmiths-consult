@@ -47,8 +47,8 @@ export function Hero() {
         }}
       /> */}
 
-      <div className="container-x relative z-10">
-        <h1 style={{ fontFamily: "var(--font-display)" }} className="max-w-4xl text-5xl leading-[1.02] sm:text-7xl lg:text-[5rem]">
+      <div className="container-x relative z-10 text-center">
+        <h1 style={{ fontFamily: "var(--font-display)" }} className="mx-auto text-center max-w-4xl text-5xl leading-[1.02] sm:text-7xl lg:text-[5rem]">
           {"Your Gateway to Global Education & Careers."
             .split(" ")
             .map((w, i) => (
@@ -72,7 +72,7 @@ export function Hero() {
           initial={{ opacity: 0, y: 14 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, delay: 0.55 }}
-          className="mt-6 max-w-xl text-md font-display sm:text-lg"
+          className="mt-6 mx-auto max-w-xl text-md font-display sm:text-lg text-center"
         >
           A quest for quality global education and unparalleled career
           opportunities. We guide you every step of the way.
@@ -82,7 +82,7 @@ export function Hero() {
           initial={{ opacity: 0, y: 14 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, delay: 0.7 }}
-          className="mt-8 flex flex-wrap items-center gap-3"
+          className="mt-8 flex flex-wrap items-center justify-center gap-3"
         >
           <Link
             href="/contact"
@@ -108,7 +108,7 @@ export function Hero() {
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.85 }}
-          className="mt-14 grid max-w-3xl gap-4 sm:grid-cols-3"
+          className="mt-14 grid max-w-3xl gap-4 sm:grid-cols-3 mx-auto"
         >
           {[
             { k: "500+", v: "Students placed" },
@@ -117,7 +117,7 @@ export function Hero() {
           ].map((s) => (
             <div
               key={s.v}
-              className="rounded-2xl border border-primary/15 bg-primary/10 px-5 py-4 backdrop-blur-md"
+              className="rounded-2xl border border-primary/15 bg-primary/10 px-5 py-4 backdrop-blur-md text-center"
             >
               <p className="font-display text-3xl">{s.k}</p>
               <p className="mt-1 text-xs uppercase tracking-[0.18em] text-foreground/70">
@@ -132,7 +132,7 @@ export function Hero() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 1, delay: 1 }}
-          className="mt-10 flex items-center gap-3 text-sm text-primary"
+          className="mt-10 flex items-center justify-center gap-3 text-sm text-ink"
         >
           <div className="flex">
             {Array.from({ length: 5 }).map((_, i) => (

@@ -55,8 +55,6 @@ export default function About() {
       </section>
 
       <Stats />
-      <Testimonials />
-      <CtaBand />
     </>
   );
 }

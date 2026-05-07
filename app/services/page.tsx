@@ -19,7 +19,6 @@ export default function ServicesPage() {
       </section>
       <Services />
       <Process />
-      <CtaBand />
     </>
   );
 }

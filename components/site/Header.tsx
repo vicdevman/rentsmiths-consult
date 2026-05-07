@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { ArrowUpRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { usePathname } from "next/navigation";
+import Image from "next/image";
 
 const nav = [
   { to: "/", label: "Home" },
@@ -59,20 +60,24 @@ export function Header() {
     <motion.header
       initial={{ y: -32, opacity: 0 }}
       animate={{ y: hidden ? -120 : 0, opacity: hidden ? 0 : 1 }}
-      transition={{ duration: 1.5, ease: [0.22, 1, 0.36, 1] }}
+      transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
       className="fixed inset-x-0 top-4 z-50 px-4"
     >
       <div
-        className={`relative flex items-center justify-between rounded-full bg-cream-deep max-w-7xl left-1/2 -translate-x-1/2 border border-primary-foreground
+        className={`relative flex items-center justify-between rounded-full bg-cream-deep max-w-7xl left-1/2 -translate-x-1/2 border border-primary/10
            p-1.5
           ${scrolled ? "" : ""
         }`}
       >
-        <Link href="/" className="flex items-center gap-2 pl-3" data-cursor="interactive" data-cursor-scale="1.4">
-          <span className="grid h-8 w-8 place-items-center rounded-full bg-primary text-primary-foreground font-display text-lg">
-            R 
-          </span>
-          <span className="font-display text-lg font-semibold tracking-tight">
+        <Link href="/" className="flex items-center gap-3 pl-2" data-cursor="interactive" data-cursor-scale="1.4">
+          <Image 
+          alt="logo"
+          src="/logo-v2.png"
+          width={500}
+          height={500}
+          className="w-10 rounded-full object-cover"
+          />
+          <span className="font-display text-xl font-semibold tracking-tight">
             Rentsmiths
           </span>
         </Link>
@@ -97,18 +102,18 @@ export function Header() {
         <div className="hidden md:block">
           <Link
             href="/contact"
-            className="group inline-flex items-center gap-1.5 rounded-full bg-primary px-5 py-4 text-md font-semibold text-primary-foreground shadow-pop transition-transform hover:scale-[1.02] active:scale-[0.98]"
+            className="group inline-flex items-center gap-1.5 rounded-full bg-primary px-5 py-3.5 text-md font-semibold text-primary-foreground shadow-pop transition-transform hover:scale-[1.02] active:scale-[0.98]"
             data-cursor="interactive"
             data-cursor-scale="2"
           >
-            Book a call
+            Reachout
             <ArrowUpRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
           </Link>
         </div>
 
         <button
           onClick={() => setOpen((v) => !v)}
-          className="relative h-10 w-10 flex items-center justify-center rounded-full bg-cream-deep pr-6 md:hidden"
+          className="relative h-12 w-12 flex items-center justify-center rounded-full bg-primary p-5 md:hidden"
           aria-label="Toggle menu"
           data-cursor="interactive"
           data-cursor-scale="1.2"
@@ -116,12 +121,12 @@ export function Header() {
           {/* two-line hamburger that morphs into X */}
           <span
             aria-hidden
-            className={`absolute block w-8 h-[2px] bg-foreground transition-transform duration-300 ${open ? 'rotate-45' : '-translate-y-1.75'}`}
+            className={`absolute block w-6 h-[2px] mt-1 bg-white transition-transform duration-300 ${open ? 'rotate-45 -mt-1' : '-translate-y-2'}`}
           />
           <span
             aria-hidden
-            className={`absolute block w-8 h-[2px] bg-foreground transition-transform duration-300 ${open ? '-rotate-45' : 'translate-y-1.75'}`}
-          />
+            className={`absolute block w-6 h-[2px] -mt-1 bg-white transition-transform duration-300 ${open ? '-rotate-45 mt-1' : 'translate-y-2'}`}
+          />  
         </button>
       </div>
 
