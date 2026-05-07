@@ -20,7 +20,7 @@ export function CtaBand() {
             </h2>
             <div className="flex flex-col items-start gap-4">
               <p className="text-primary-foreground/85">
-                Book a free 30-minute strategy call and walk away with a clear next step — even if
+                Book a free 30-minute strategy call and walk away with a clear next step, even if
                 you don't sign with us.
               </p>
               <Link

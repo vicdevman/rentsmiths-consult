@@ -22,8 +22,7 @@ export default function Index() {
       <BreakImage />
       <Stats />
       <Industries />
-      <Testimonials />
-      <CtaBand />
+     
     </>
   );
 }

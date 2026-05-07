@@ -2,7 +2,10 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Header } from "@/components/site/Header";
+import CursorFollower from "@/components/ui/CursorFollower";
 import Footer from "@/components/site/Footer";
+import { Testimonials } from "@/components/site/Testimonials";
+import { CtaBand } from "@/components/site/CtaBand";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -35,8 +38,13 @@ export default function RootLayout({
         <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300..700&display=swap" rel="stylesheet" />
       </head>
       <Header/>
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">{children}
+        <CursorFollower />
+      </body>
+       <Testimonials />
+      <CtaBand />
       <Footer/>
+      
     </html>
   );
 }

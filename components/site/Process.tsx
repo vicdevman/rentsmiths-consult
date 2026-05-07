@@ -25,9 +25,9 @@ const steps = [
 
 export function Process() {
   return (
-    <section className="container-x py-24 sm:py-32">
+    <section className="relative container-x py-24 sm:py-32">
       <div className="grid gap-12 lg:grid-cols-[1fr_1.4fr] lg:items-start">
-        <Reveal>
+        <Reveal className="lg:sticky lg:top-50">
           <span className="pill">Our process</span>
           <h2 className="mt-4 text-4xl sm:text-5xl">
             A streamlined process for lasting results.
@@ -38,10 +38,10 @@ export function Process() {
           </p>
         </Reveal>
 
-        <div className="space-y-4">
+        <div className="space-y-4 flex flex-col gap-4">
           {steps.map((s, i) => (
             <Reveal key={s.n} delay={i * 0.08}>
-              <div className="group flex items-start gap-5 rounded-3xl bg-cream-deep p-6 transition-colors hover:bg-primary hover:text-primary-foreground">
+              <div className="group flex items-start gap-5 rounded-2xl bg-cream-deep p-6 transition-colors hover:bg-primary hover:text-primary-foreground">
                 <span className="font-display text-3xl text-primary group-hover:text-primary-foreground">
                   {s.n}
                 </span>

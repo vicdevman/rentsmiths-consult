@@ -29,19 +29,26 @@ export function Hero() {
           fetchPriority="high"
         />
       </motion.div>
-      {/* Warm orange overlay (Flexio palette) */}
+      {/* Cream-deep overlay to match other pages (covers image, sits behind content) */}
       <div
-        className="absolute inset-0 -z-10"
+        className="absolute inset-0"
         style={{
-          background:
-            "linear-gradient(135deg, oklch(0.685 0.205 35 / 0.92) 0%, oklch(0.62 0.21 32 / 0.88) 20%, oklch(0.55 0.2 30 / 0.92) 100%)",
+          background: "var(--cream)",
+          opacity: 0.98,
+          zIndex: 0,
         }}
       />
-      {/* Soft grain noise vignette */}
-      <div className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_top,transparent_30%,rgba(0,0,0,0.35)_100%)]" />
+      {/* Soft grain noise vignette above overlay */}
+      {/* <div
+        className="absolute inset-0"
+        style={{
+          background: "radial-gradient(ellipse at top, transparent 30%, rgba(0,0,0,0.35) 100%)",
+          zIndex: 1,
+        }}
+      /> */}
 
-      <div className="container-x text-primary-foreground">
-        <h1 className="max-w-4xl font-display text-5xl leading-[1.02] sm:text-7xl lg:text-[5.5rem]">
+      <div className="container-x relative z-10">
+        <h1 style={{ fontFamily: "var(--font-display)" }} className="max-w-4xl text-5xl leading-[1.02] sm:text-7xl lg:text-[5rem]">
           {"Your Gateway to Global Education & Careers."
             .split(" ")
             .map((w, i) => (
@@ -65,7 +72,7 @@ export function Hero() {
           initial={{ opacity: 0, y: 14 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, delay: 0.55 }}
-          className="mt-6 max-w-xl text-base text-primary-foreground/85 sm:text-lg"
+          className="mt-6 max-w-xl text-md font-display sm:text-lg"
         >
           A quest for quality global education and unparalleled career
           opportunities. We guide you every step of the way.
@@ -79,14 +86,18 @@ export function Hero() {
         >
           <Link
             href="/contact"
-            className="group inline-flex items-center gap-2 rounded-full bg-background px-6 py-3.5 text-sm font-semibold text-foreground shadow-pop transition-transform hover:scale-[1.02]"
+            className="group inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3.5 text-sm font-semibold text-primary-foreground transition-transform hover:scale-[1.02]"
+            data-cursor="interactive"
+            data-cursor-scale="1.6"
           >
             Get started now
             <ArrowUpRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
           </Link>
           <Link
             href="/services"
-            className="inline-flex items-center gap-2 rounded-full border border-primary-foreground/30 bg-primary-foreground/5 px-6 py-3.5 text-sm font-semibold backdrop-blur-md transition-colors hover:bg-primary-foreground/15"
+            className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-cream-deep/5 px-6 py-3.5 text-sm font-semibold backdrop-blur-md transition-colors hover:bg-cream-deep/15 text-primary"
+            data-cursor="interactive"
+            data-cursor-scale="1.4"
           >
             Explore services
           </Link>
@@ -106,10 +117,10 @@ export function Hero() {
           ].map((s) => (
             <div
               key={s.v}
-              className="rounded-2xl border border-primary-foreground/15 bg-primary-foreground/10 px-5 py-4 backdrop-blur-md"
+              className="rounded-2xl border border-primary/15 bg-primary/10 px-5 py-4 backdrop-blur-md"
             >
               <p className="font-display text-3xl">{s.k}</p>
-              <p className="mt-1 text-xs uppercase tracking-[0.18em] text-primary-foreground/75">
+              <p className="mt-1 text-xs uppercase tracking-[0.18em] text-foreground/70">
                 {s.v}
               </p>
             </div>
@@ -121,7 +132,7 @@ export function Hero() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 1, delay: 1 }}
-          className="mt-10 flex items-center gap-3 text-sm text-primary-foreground/85"
+          className="mt-10 flex items-center gap-3 text-sm text-primary"
         >
           <div className="flex">
             {Array.from({ length: 5 }).map((_, i) => (

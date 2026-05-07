@@ -112,7 +112,7 @@ export default function Contact() {
                   name="message"
                   rows={5}
                   placeholder="Tell us about your goals..."
-                  className="mt-2 w-full rounded-2xl border border-border bg-cream-deep px-4 py-3 text-sm outline-none transition focus:border-primary focus:bg-background"
+                  className="mt-2 w-full rounded-lg border border-border bg-cream px-4 py-3 text-sm outline-none transition focus:border-primary focus:bg-background"
                 />
               </div>
 
@@ -124,7 +124,7 @@ export default function Contact() {
                 <ArrowUpRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
               </button>
               <p className="mt-3 text-xs text-muted-foreground">
-                By submitting, you agree to be contacted by our team. No spam — ever.
+                By submitting, you agree to be contacted by our team. No spam.
               </p>
             </form>
           </Reveal>
@@ -154,7 +154,7 @@ function Field({
         name={name}
         type={type}
         placeholder={placeholder}
-        className="mt-2 w-full rounded-lg border border-border bg-cream-deep px-4 py-3 text-sm outline-none transition focus:border-primary focus:bg-background"
+        className="mt-2 w-full rounded-md border border-border bg-cream px-4 py-3 text-sm outline-none transition focus:border-primary focus:bg-background"
       />
     </label>
   );
@@ -176,7 +176,7 @@ function SelectField({
       </span>
       <select
         name={name}
-        className="mt-2 w-full rounded-lg border border-border bg-cream-deep px-4 py-3 text-sm outline-none transition focus:border-primary focus:bg-background"
+        className="mt-2 w-full rounded-md border border-border bg-cream px-4 py-3 text-sm outline-none transition focus:border-primary focus:bg-background"
       >
         {options.map((o) => (
           <option key={o}>{o}</option>

@@ -15,7 +15,7 @@ export default function Footer() {
               <span className="font-display text-xl">Rentsmiths</span>
             </div>
             <p className="mt-5 max-w-sm text-sm text-cream/70">
-              Your trusted partner in achieving global education and career goals — from first
+              Your trusted partner in achieving global education and career goals, from first
               consultation to landing day.
             </p>
             <div className="mt-6 flex gap-2">
