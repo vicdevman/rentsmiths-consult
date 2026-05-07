@@ -1,3 +1,5 @@
+'use client'
+
 import { Reveal } from "./Reveal";
 
 const items = [
@@ -39,7 +41,7 @@ export function Industries() {
             return (
               <Reveal key={i} delay={idx * 0.04}>
                 <span
-                  className={`inline-flex items-center gap-3 rounded-full border px-5 py-3 text-sm font-medium transition-all whitespace-nowrap bg-${c}-50 text-${c}-700 hover:bg-${c}-100`}
+                  className={`inline-flex items-center gap-3 rounded-full border px-5 py-3 text-sm font-medium transition-all whitespace-nowrap bg-${c}-500 text-primary-foreground hover:bg-${c}-100`}
                 >
                   {i}
                 </span>
