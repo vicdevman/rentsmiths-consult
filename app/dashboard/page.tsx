@@ -55,10 +55,10 @@ function PopupModal({
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.92, y: 24 }}
             transition={{ type: "spring", damping: 26, stiffness: 300 }}
-            className="fixed inset-0 z-50 flex items-center justify-center p-4"
+            className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4"
           >
             <div
-              className="relative w-full max-w-lg rounded-2xl border border-border bg-cream p-6 shadow-pop"
+              className="relative w-full max-w-lg rounded-2xl border border-border bg-cream p-4 sm:p-6 shadow-pop"
               onClick={(e) => e.stopPropagation()}
             >
               <button
@@ -68,7 +68,7 @@ function PopupModal({
               >
                 <X className="h-4 w-4" />
               </button>
-              <h2 className="font-display text-lg font-semibold">{title}</h2>
+              <h2 className="font-display text-base sm:text-lg font-semibold">{title}</h2>
               {description && (
                 <p className="mt-1 text-sm text-muted-foreground">{description}</p>
               )}
@@ -123,9 +123,9 @@ export default function DashboardPage() {
   return (
     <AuthGuard>
       <div className="min-h-screen bg-cream">
-        <div className="container-x flex min-h-screen flex-col py-6">
+        <div className="container-x flex min-h-screen flex-col py-4 sm:py-6">
           {/* Top bar */}
-          <div className="flex items-center justify-between gap-3">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-center gap-3">
               <button
                 type="button"
@@ -135,19 +135,19 @@ export default function DashboardPage() {
                 <Menu className="h-5 w-5" />
               </button>
               <div>
-                <h1 className="font-display text-xl font-semibold">Dashboard</h1>
-                <p className="text-sm text-muted-foreground">Manage content blocks on your site.</p>
+                <h1 className="font-display text-lg sm:text-xl font-semibold">Dashboard</h1>
+                <p className="text-xs sm:text-sm text-muted-foreground">Manage content blocks on your site.</p>
               </div>
             </div>
 
             <div className="flex items-center gap-2">
-              <Button onClick={onSave} disabled={!content || saving} className="gap-2">
+              <Button onClick={onSave} disabled={!content || saving} className="gap-2" size="sm">
                 <Save className="h-4 w-4" />
-                {saving ? "Saving" : "Save"}
+                <span className="inline">{saving ? "Saving" : "Save"}</span>
               </Button>
-              <Button variant="outline" onClick={onLogout} className="gap-2">
+              <Button variant="outline" onClick={onLogout} className="gap-2" size="sm">
                 <LogOut className="h-4 w-4" />
-                <span className="hidden sm:inline">Logout</span>
+                <span className="inline">Logout</span>
               </Button>
             </div>
           </div>
@@ -270,7 +270,7 @@ function ImageUpload({ value, onChange }: { value: string; onChange: (next: stri
         <button
           type="button"
           onClick={() => document.getElementById(inputId)?.click()}
-          className="flex items-center justify-center gap-2 rounded-lg border-2 border-dashed border-border bg-cream p-6 text-sm text-muted-foreground transition-colors hover:border-primary/40 hover:text-foreground"
+          className="flex items-center justify-center gap-2 rounded-lg border-2 border-dashed border-border bg-cream p-4 sm:p-6 text-sm text-muted-foreground transition-colors hover:border-primary/40 hover:text-foreground"
         >
           <ImagePlus className="h-5 w-5" />
           Add image

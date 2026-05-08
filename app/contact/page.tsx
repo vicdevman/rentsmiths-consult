@@ -1,4 +1,4 @@
-'use client'
+"use client";
 import { Mail, Phone, MapPin, ArrowUpRight } from "lucide-react";
 import { useState } from "react";
 import { Reveal } from "@/components/site/Reveal";
@@ -7,6 +7,66 @@ import { InstagramIcon, FacebookIcon, LinkedinIcon, TwitterIcon } from "@/compon
 
 export default function Contact() {
   const [sent, setSent] = useState(false);
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    interest: "",
+    message: "",
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState({
+    type: null as null | "success" | "error",
+    message: "",
+  });
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    setFormData((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setSubmitStatus({ type: null, message: "" });
+    setSent(false);
+
+    try {
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setSent(true);
+        setSubmitStatus({
+          type: "success",
+          message:
+            "Message sent successfully! Check your email for confirmation.",
+        });
+        setFormData({ name: "", email: "", phone: "", interest: "", message: "" });
+      } else {
+        setSubmitStatus({
+          type: "error",
+          message: data.error || "Failed to send message. Please try again.",
+        });
+      }
+    } catch (error) {
+      setSubmitStatus({
+        type: "error",
+        message: "An error occurred. Please try again later.",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <>
@@ -79,29 +139,29 @@ export default function Contact() {
           {/* Form column */}
           <Reveal delay={0.1}>
             <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                setSent(true);
-              }}
+              onSubmit={handleSubmit}
               className="rounded-3xl bg-background p-6 shadow-soft ring-1 ring-border"
             >
               <div className="grid gap-4 sm:grid-cols-2">
-                <Field label="Full name" name="name" placeholder="Jane Doe" />
-                <Field label="Email" name="email" type="email" placeholder="jane@email.com" />
+                <Field label="Full name" name="name" placeholder="Jane Doe" value={formData.name} onChange={handleChange} />
+                <Field label="Email" name="email" type="email" placeholder="jane@email.com" value={formData.email} onChange={handleChange} />
               </div>
               <div className="mt-4 grid gap-4 sm:grid-cols-2">
-                <Field label="Phone" name="phone" placeholder="+234..." />
+                <Field label="Phone" name="phone" placeholder="+234..." value={formData.phone} onChange={handleChange} />
                 <SelectField
                   label="I'm interested in"
                   name="interest"
                   options={[
-                    "University admissions",
-                    "Scholarship strategy",
-                    "Visa & immigration",
-                    "Career placement",
-                    "Test prep coaching",
-                    "Something else",
+                    "Study abroad",
+                    "Work abroad",
+                    "Scholarships",
+                    "Trainings",
+                    "Visa / work permit",
+                    "Online university",
+                    "Something else"
                   ]}
+                  value={formData.interest}
+                  onChange={handleChange}
                 />
               </div>
               <div className="mt-4">
@@ -112,15 +172,28 @@ export default function Contact() {
                   name="message"
                   rows={5}
                   placeholder="Tell us about your goals..."
+                  value={formData.message}
+                  onChange={handleChange}
                   className="mt-2 w-full rounded-lg border border-border bg-cream px-4 py-3 text-sm outline-none transition focus:border-primary focus:bg-background"
                 />
               </div>
 
+              {submitStatus.type ? (
+                <p
+                  className={`mt-4 text-sm ${
+                    submitStatus.type === "success" ? "text-emerald-700" : "text-destructive"
+                  }`}
+                >
+                  {submitStatus.message}
+                </p>
+              ) : null}
+
               <button
                 type="submit"
+                disabled={isSubmitting}
                 className="group mt-6 inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3.5 text-sm font-semibold text-primary-foreground shadow-pop transition-transform hover:scale-[1.02]"
               >
-                {sent ? "Message sent — we'll be in touch" : "Send message"}
+                {isSubmitting ? "Sending..." : sent ? "Message sent — we'll be in touch" : "Send message"}
                 <ArrowUpRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
               </button>
               <p className="mt-3 text-xs text-muted-foreground">
@@ -139,11 +212,15 @@ function Field({
   name,
   type = "text",
   placeholder,
+  value,
+  onChange,
 }: {
   label: string;
   name: string;
   type?: string;
   placeholder?: string;
+  value?: string;
+  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }) {
   return (
     <label className="block">
@@ -154,6 +231,8 @@ function Field({
         name={name}
         type={type}
         placeholder={placeholder}
+        value={value}
+        onChange={onChange}
         className="mt-2 w-full rounded-md border border-border bg-cream px-4 py-3 text-sm outline-none transition focus:border-primary focus:bg-background"
       />
     </label>
@@ -164,10 +243,14 @@ function SelectField({
   label,
   name,
   options,
+  value,
+  onChange,
 }: {
   label: string;
   name: string;
   options: string[];
+  value?: string;
+  onChange?: (e: React.ChangeEvent<HTMLSelectElement>) => void;
 }) {
   return (
     <label className="block">
@@ -176,8 +259,13 @@ function SelectField({
       </span>
       <select
         name={name}
+        value={value}
+        onChange={onChange}
         className="mt-2 w-full rounded-md border border-border bg-cream px-4 py-3 text-sm outline-none transition focus:border-primary focus:bg-background"
       >
+        <option value="" disabled>
+          Select an option
+        </option>
         {options.map((o) => (
           <option key={o}>{o}</option>
         ))}

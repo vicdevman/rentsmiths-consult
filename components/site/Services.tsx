@@ -7,34 +7,34 @@ import s3 from "@/assets/service-3.jpg";
 
 export const services = [
   {
-    title: "University Admissions",
-    desc: "Strategic university shortlisting, SOPs, and application packaging that gets you in.",
+    title: "Study abroad",
+    desc: "End-to-end guidance from school selection to SOP/CV and applications — so you get offers faster with less stress.",
     img: s1,
     tag: "Most popular",
   },
   {
-    title: "Scholarship Strategy",
-    desc: "We surface and pursue scholarships that match your profile, scores, and ambitions.",
+    title: "Work abroad",
+    desc: "We help you position your profile, target the right roles, and prepare for interviews to land international opportunities.",
     img: s2,
   },
   {
-    title: "Visa & Immigration",
-    desc: "End-to-end visa documentation, mock interviews, and embassy follow-through.",
+    title: "Scholarships",
+    desc: "Scholarship matching, compelling essays, and deadline management — built to maximize funding and acceptance odds.",
     img: s3,
   },
   {
-    title: "Career Placement",
-    desc: "International job matching, employer intros, and offer-stage negotiation support.",
+    title: "Trainings",
+    desc: "Practical trainings to upgrade your skills and profile — from test prep to career-ready coaching and portfolio reviews.",
     img: s1,
   },
   {
-    title: "Test Prep Coaching",
-    desc: "IELTS, TOEFL, GRE & GMAT prep with verified tutors and weekly mock sessions.",
+    title: "Visa / work permit",
+    desc: "Documentation, forms, timelines, and mock interviews — with checks that reduce errors and costly delays.",
     img: s2,
   },
   {
-    title: "Post-Arrival Support",
-    desc: "Housing, banking, SIM, and onboarding help so you settle in stress-free.",
+    title: "Online university",
+    desc: "Flexible online degree options with credible institutions — ideal if you need quality education without relocating.",
     img: s3,
   },
 ];
