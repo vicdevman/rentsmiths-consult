@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Inter } from "next/font/google";
+import React, { Suspense } from "react";
 import "./globals.css";
 import { SiteChrome } from "@/components/site/SiteChrome";
 import { cn } from "@/lib/utils";
@@ -111,9 +112,11 @@ export default function RootLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
         />
-        <SiteContentProvider>
-          <SiteChrome>{children}</SiteChrome>
-        </SiteContentProvider>
+        <Suspense fallback={<div />}> 
+          <SiteContentProvider>
+            <SiteChrome>{children}</SiteChrome>
+          </SiteContentProvider>
+        </Suspense>
       </body>
     </html>
   );
