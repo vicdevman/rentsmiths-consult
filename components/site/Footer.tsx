@@ -19,14 +19,17 @@ export default function Footer() {
               consultation to landing day.
             </p>
             <div className="mt-6 flex gap-2">
-              {[InstagramIcon, FacebookIcon, LinkedinIcon, TwitterIcon].map((Icon, i) => (
+             {[{icon:InstagramIcon, link:'https://www.instagram.com/rentsmiths'}, {icon:FacebookIcon, link:"https://www.facebook.com/rentsmithsglobaleducarionconsult"}, {icon:LinkedinIcon, link:"https://www.linkedin.com/in/tope-akinwumi-22963046"}].map((e, i) => (
+
                 <a
                   key={i}
-                  href="#"
+                  href={e.link}
                   className="grid h-10 w-10 place-items-center rounded-full border border-cream/15 text-cream/80 transition-colors hover:bg-primary hover:text-primary-foreground hover:border-transparent"
                   aria-label="social"
+                  target="_blank"
+                  rel="noopener noreferrer"
                 >
-                  <Icon className="h-4 w-4" />
+                  <e.icon className="h-4 w-4" />
                 </a>
               ))}
             </div>

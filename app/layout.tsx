@@ -3,6 +3,7 @@ import { Geist, Geist_Mono, Inter } from "next/font/google";
 import "./globals.css";
 import { SiteChrome } from "@/components/site/SiteChrome";
 import { cn } from "@/lib/utils";
+import { SiteContentProvider } from "@/components/site/SiteContentProvider";
 
 const inter = Inter({subsets:['latin'],variable:'--font-sans'});
 
@@ -110,7 +111,9 @@ export default function RootLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
         />
-        <SiteChrome>{children}</SiteChrome>
+        <SiteContentProvider>
+          <SiteChrome>{children}</SiteChrome>
+        </SiteContentProvider>
       </body>
     </html>
   );

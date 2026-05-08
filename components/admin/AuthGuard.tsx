@@ -2,17 +2,21 @@
 
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, type ReactNode } from "react";
+import { onAuthStateChanged } from "firebase/auth";
+import { auth } from "@/lib/firebaseConfig";
 
 export function AuthGuard({ children }: { children: ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
 
   useEffect(() => {
-    const token = window.localStorage.getItem("rentsmiths_auth_token");
-    if (!token) {
-      const next = pathname ? `?next=${encodeURIComponent(pathname)}` : "";
-      router.replace(`/login${next}`);
-    }
+    const unsub = onAuthStateChanged(auth, (user) => {
+      if (!user) {
+        const next = pathname ? `?next=${encodeURIComponent(pathname)}` : "";
+        router.replace(`/login${next}`);
+      }
+    });
+    return () => unsub();
   }, [router, pathname]);
 
   return <>{children}</>;

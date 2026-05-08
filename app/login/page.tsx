@@ -4,21 +4,30 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Lock, Mail, ArrowRight } from "lucide-react";
+import { loginWithPassword } from "@/lib/admin/contentClient";
 
 export default function LoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  function onSubmit(e: React.FormEvent) {
+  async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
-    // Placeholder — skip real auth, just stash a dummy token and redirect
-    setTimeout(() => {
-      window.localStorage.setItem("rentsmiths_auth_token", "dev-token");
-      router.replace("/dashboard");
-    }, 600);
+    setError(null);
+    try {
+      await loginWithPassword(email, password);
+      const params = new URLSearchParams(window.location.search);
+      const next = params.get("next") || "/dashboard";
+      router.replace(next);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Login failed";
+      setError(message);
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -110,9 +119,11 @@ export default function LoginPage() {
               </AnimatePresence>
             </motion.button>
 
-            <p className="mt-1 text-center text-xs text-muted-foreground/60">
-              Placeholder login — any credentials will work for now.
-            </p>
+            {error ? (
+              <p className="mt-1 text-center text-xs text-destructive">
+                {error}
+              </p>
+            ) : null}
           </form>
         </div>
       </motion.div>

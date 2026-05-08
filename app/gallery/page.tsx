@@ -1,4 +1,4 @@
-'use client'
+"use client"
 import { motion } from "framer-motion";
 import { Reveal } from "@/components/site/Reveal";
 import { CtaBand } from "@/components/site/CtaBand";
@@ -8,8 +8,9 @@ import g3 from "@/assets/gallery-3.jpg";
 import g4 from "@/assets/gallery-4.jpg";
 import g5 from "@/assets/gallery-5.jpg";
 import g6 from "@/assets/gallery-6.jpg";
+import { useSiteContent } from "@/components/site/SiteContentProvider";
 
-const items = [
+const fallback = [
   { img: g1.src, title: "Class of 2024", desc: "Our largest cohort yet — 80+ students placed in top global universities." },
   { img: g2.src, title: "Visa Approval Day", desc: "Every stamp represents months of preparation and a future unlocked." },
   { img: g3.src, title: "Campus Life Begins", desc: "Students settling into their new universities across Canada and the UK." },
@@ -19,6 +20,15 @@ const items = [
 ];
 
 export default function Gallery() {
+  const { content } = useSiteContent();
+
+  const fromDb = (content?.gallery ?? []).map((g) => ({
+    img: { src: g.imageUrl || g1.src },
+    title: g.title || "",
+    desc: g.alt || "",
+  }));
+
+  const source = fromDb.length ? fromDb : fallback;
   return (
     <>
       <section className="container-x pt-40 pb-16 sm:pt-48">
@@ -33,9 +43,9 @@ export default function Gallery() {
         </Reveal>
       </section>
 
-      <section className="container-x pb-24">
+      <section id="gallery" className="container-x pb-24">
         <div className="columns-1 gap-6 sm:columns-2 lg:columns-3 [column-fill:_balance]">
-          {items.map((it, i) => (
+          {source.map((it: any, i: any) => (
             <motion.figure
               key={it.title}
               initial={{ opacity: 0, y: 30 }}

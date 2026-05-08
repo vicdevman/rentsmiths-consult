@@ -5,7 +5,13 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "seed:services": "node ./scripts/seedServices.mjs",
+    "seed:stats": "node ./scripts/seedStats.mjs",
+    "seed:testimonials": "node ./scripts/seedTestimonials.mjs",
+    "seed:gallery": "node ./scripts/seedGallery.mjs",
+    "seed:all": "node ./scripts/seedAllWithCloudinaryUploads.mjs",
+    "admin:create": "node ./scripts/createAdminUser.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
@@ -39,7 +45,10 @@
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
     "date-fns": "^4.1.0",
+    "dotenv": "^17.4.2",
     "embla-carousel-react": "^8.6.0",
+    "firebase": "^12.13.0",
+    "firebase-admin": "^13.5.0",
     "framer-motion": "^12.38.0",
     "input-otp": "^1.4.2",
     "lucide-react": "^1.14.0",

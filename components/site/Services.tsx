@@ -1,9 +1,12 @@
+'use client'
+
 import { ArrowUpRight } from "lucide-react";
 import Link from "next/link";
 import { Reveal } from "./Reveal";
 import s1 from "@/assets/service-1.jpg";
 import s2 from "@/assets/service-2.jpg";
 import s3 from "@/assets/service-3.jpg";
+import { useSiteContent } from "@/components/site/SiteContentProvider";
 
 export const services = [
   {
@@ -40,7 +43,23 @@ export const services = [
 ];
 
 export function Services({ limit }: { limit?: number }) {
-  const items = limit ? services.slice(0, limit) : services;
+  const { content } = useSiteContent();
+  const fallback = services.map((s) => ({
+    title: s.title,
+    desc: s.desc,
+    img: s.img,
+    tag: s.tag,
+  }));
+
+  const fromDb = (content?.services ?? []).map((s) => ({
+    title: s.title,
+    desc: s.description,
+    img: { src: s.imageUrl || s1.src },
+    tag: s.tag,
+  }));
+
+  const source = fromDb.length ? fromDb : fallback;
+  const items = limit ? source.slice(0, limit) : source;
   return (
     <section id="services" className="bg-cream-deep py-24 sm:py-32">
       <div className="container-x">

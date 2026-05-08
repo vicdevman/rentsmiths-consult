@@ -1,4 +1,5 @@
 import { Reveal } from "./Reveal";
+import { useSiteContent } from "@/components/site/SiteContentProvider";
 
 const tts = [
   {
@@ -19,6 +20,13 @@ const tts = [
 ];
 
 export function Testimonials() {
+  const { content } = useSiteContent();
+  const fromDb = (content?.testimonials ?? []).map((t) => ({
+    q: t.quote,
+    n: t.name,
+    role: t.role,
+  }));
+  const source = fromDb.length ? fromDb : tts;
   return (
     <section className="container-x py-24 sm:py-32">
       <Reveal className="text-center">
@@ -29,7 +37,7 @@ export function Testimonials() {
       </Reveal>
 
       <div className="mt-14 grid gap-5 md:grid-cols-3">
-        {tts.map((t, i) => (
+        {source.map((t, i) => (
           <Reveal key={t.n} delay={i * 0.08}>
             <figure
               className={`flex h-full flex-col justify-between rounded-3xl p-7 ${

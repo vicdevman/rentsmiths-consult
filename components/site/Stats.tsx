@@ -3,6 +3,7 @@
 import { motion, useInView } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { Reveal } from "./Reveal";
+import { useSiteContent } from "@/components/site/SiteContentProvider";
 
 const stats = [
   { k: 8, suffix: "+", label: "Years of expertise" },
@@ -36,6 +37,9 @@ function Counter({ to, suffix }: { to: number; suffix: string }) {
 }
 
 export function Stats() {
+  const { content } = useSiteContent();
+  const fromDb = (content?.stats ?? []).map((s) => ({ k: s.value, suffix: s.suffix, label: s.label }));
+  const source = fromDb.length ? fromDb : stats;
   return (
     <section className="container-x py-24 sm:py-32">
       <Reveal className="text-center">
@@ -46,7 +50,7 @@ export function Stats() {
       </Reveal>
 
       <div className="mt-14 grid gap-4 sm:grid-cols-3">
-        {stats.map((s, i) => (
+        {source.map((s, i) => (
           <motion.div
             key={s.label}
             initial={{ opacity: 0, y: 20 }}

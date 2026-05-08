@@ -4,18 +4,124 @@ import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import { AuthGuard } from "@/components/admin/AuthGuard";
 import type { EditableContent, GalleryItem, ServiceItem, StatItem, TestimonialItem } from "@/lib/admin/types";
-import { getEditableContent, saveEditableContent } from "@/lib/admin/contentClient";
+import { getEditableContent, publishEditableContent, saveEditableContent, logout, revertDraft } from "@/lib/admin/contentClient";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, LogOut, Plus, Save, X, LayoutGrid, BarChart3, MessageSquareQuote, Image as ImageIcon, ImagePlus, Trash2 } from "lucide-react";
+import { Menu, LogOut, Plus, Eye, Save, X, LayoutGrid, BarChart3, MessageSquareQuote, Image as ImageIcon, Trash2 } from "lucide-react";
 
 type SectionKey = "services" | "stats" | "testimonials" | "gallery";
 
 function uid(prefix: string) {
   return `${prefix}_${Math.random().toString(16).slice(2)}_${Date.now().toString(16)}`;
+}
+
+/* ------------------------------------------------------------------ */
+/*  Cloudinary signed upload helper                                   */
+/* ------------------------------------------------------------------ */
+async function uploadToCloudinarySigned(file: File): Promise<{ secureUrl: string }> {
+  const signRes = await fetch("/api/cloudinary/sign", { method: "POST" });
+  const signData = (await signRes.json()) as {
+    cloudName?: string;
+    apiKey?: string;
+    timestamp?: number;
+    folder?: string;
+    signature?: string;
+    error?: string;
+  };
+  if (!signRes.ok) {
+    throw new Error(signData?.error || "Failed to sign Cloudinary request");
+  }
+  const { cloudName, apiKey, timestamp, folder, signature } = signData;
+  if (!cloudName || !apiKey || !timestamp || !folder || !signature) {
+    throw new Error("Cloudinary signing response missing fields");
+  }
+
+  const url = `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`;
+  const form = new FormData();
+  form.append("file", file);
+  form.append("api_key", apiKey);
+  form.append("timestamp", String(timestamp));
+  form.append("folder", folder);
+  form.append("signature", signature);
+
+  const uploadRes = await fetch(url, { method: "POST", body: form });
+  const uploadData = (await uploadRes.json()) as { secure_url?: string; error?: { message?: string } };
+  if (!uploadRes.ok) {
+    throw new Error(uploadData?.error?.message || "Cloudinary upload failed");
+  }
+  if (!uploadData.secure_url) throw new Error("Cloudinary response missing secure_url");
+  return { secureUrl: uploadData.secure_url };
+}
+
+function CloudinaryUpload({ value, onChange }: { value: string; onChange: (next: string) => void }) {
+  const [uploading, setUploading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const inputId = `cld-${Math.random().toString(36).slice(2, 8)}`;
+
+  async function onFile(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setError(null);
+    setUploading(true);
+    try {
+      const { secureUrl } = await uploadToCloudinarySigned(file);
+      onChange(secureUrl);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "Upload failed";
+      setError(msg);
+    } finally {
+      setUploading(false);
+      e.target.value = "";
+    }
+  }
+
+  return (
+    <div className="grid gap-2">
+      <input id={inputId} type="file" accept="image/*" className="hidden" onChange={onFile} />
+
+      <div className="relative overflow-hidden rounded-xl border bg-cream">
+        <div className="aspect-[16/10] bg-cream-deep">
+          {value ? (
+            <img src={value} alt="" className="h-full w-full object-cover" />
+          ) : (
+            <div className="flex h-full w-full items-center justify-center text-sm text-muted-foreground">
+              No image
+            </div>
+          )}
+        </div>
+
+        <div className="absolute left-3 top-3 flex items-center gap-2">
+          <Button
+            type="button"
+            size="sm"
+            variant="outline"
+            className="bg-cream/90 backdrop-blur"
+            onClick={() => document.getElementById(inputId)?.click()}
+            disabled={uploading}
+          >
+            {uploading ? "Uploading…" : value ? "Change image" : "Upload image"}
+          </Button>
+          {value ? (
+            <Button
+              type="button"
+              size="sm"
+              variant="outline"
+              className="bg-cream/90 backdrop-blur text-destructive hover:bg-destructive/10"
+              onClick={() => onChange("")}
+              disabled={uploading}
+            >
+              Remove
+            </Button>
+          ) : null}
+        </div>
+      </div>
+
+      {error ? <p className="text-xs text-destructive">{error}</p> : null}
+    </div>
+  );
 }
 
 /* ------------------------------------------------------------------ */
@@ -27,38 +133,41 @@ function PopupModal({
   title,
   description,
   children,
+  variant,
 }: {
   open: boolean;
   onClose: () => void;
   title: string;
   description?: string;
   children: ReactNode;
+  variant?: "center" | "sidebar";
 }) {
+  const isSidebar = variant === "sidebar";
+
   return (
     <AnimatePresence>
       {open && (
         <>
-          {/* backdrop */}
           <motion.div
             key="backdrop"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
+            transition={{ duration: 0.18 }}
             onClick={onClose}
-            className="fixed inset-0 z-50 bg-ink/40 backdrop-blur-sm"
+            className="fixed inset-0 z-50 bg-ink/20"
           />
-          {/* modal */}
+
           <motion.div
             key="modal"
-            initial={{ opacity: 0, scale: 0.92, y: 24 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.92, y: 24 }}
+            initial={isSidebar ? { x: 260, opacity: 0 } : { opacity: 0, scale: 0.98, y: 12 }}
+            animate={isSidebar ? { x: 0, opacity: 1 } : { opacity: 1, scale: 1, y: 0 }}
+            exit={isSidebar ? { x: 260, opacity: 0 } : { opacity: 0, scale: 0.98, y: 12 }}
             transition={{ type: "spring", damping: 26, stiffness: 300 }}
-            className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4"
+            className={isSidebar ? "fixed inset-y-0 right-0 z-50 flex w-full max-w-sm p-3" : "fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4"}
           >
             <div
-              className="relative w-full max-w-lg rounded-2xl border border-border bg-cream p-4 sm:p-6 shadow-pop"
+              className={`relative w-full ${isSidebar ? "h-full max-h-full rounded-l-2xl border bg-cream p-4 sm:p-6" : "max-w-lg rounded-2xl border bg-cream p-4 sm:p-6"}`}
               onClick={(e) => e.stopPropagation()}
             >
               <button
@@ -72,7 +181,7 @@ function PopupModal({
               {description && (
                 <p className="mt-1 text-sm text-muted-foreground">{description}</p>
               )}
-              <div className="mt-5">{children}</div>
+              <div className="mt-5 max-h-[80vh] overflow-auto">{children}</div>
             </div>
           </motion.div>
         </>
@@ -89,6 +198,7 @@ export default function DashboardPage() {
   const [section, setSection] = useState<SectionKey>("services");
   const [content, setContent] = useState<EditableContent | null>(null);
   const [saving, setSaving] = useState(false);
+  const [dirty, setDirty] = useState(false);
   const [mobileNav, setMobileNav] = useState(false);
 
   useEffect(() => {
@@ -106,15 +216,37 @@ export default function DashboardPage() {
   );
 
   async function onLogout() {
-    window.localStorage.removeItem("rentsmiths_auth_token");
+    await logout();
     router.replace("/login");
   }
 
-  async function onSave() {
+  async function onPublish() {
     if (!content) return;
     setSaving(true);
     try {
-      await saveEditableContent(content);
+      await publishEditableContent(content);
+      setDirty(false);
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function onPreview() {
+    const url = new URL(window.location.origin);
+    url.searchParams.set("preview", "1");
+    try { window.localStorage.setItem("rentsmiths_preview", "1"); } catch (e) {}
+    // navigate in same tab and jump to the gallery section
+    router.push(`${url.pathname}${url.search}#gallery`);
+  }
+
+  async function onRevert() {
+    if (!confirm("Revert draft to the last published version? This cannot be undone.")) return;
+    setSaving(true);
+    try {
+      await revertDraft();
+      const fresh = await getEditableContent();
+      setContent(fresh);
+      setDirty(false);
     } finally {
       setSaving(false);
     }
@@ -125,7 +257,7 @@ export default function DashboardPage() {
       <div className="min-h-screen bg-cream">
         <div className="container-x flex min-h-screen flex-col py-4 sm:py-6">
           {/* Top bar */}
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between flex-wrap">
             <div className="flex items-center gap-3">
               <button
                 type="button"
@@ -141,9 +273,17 @@ export default function DashboardPage() {
             </div>
 
             <div className="flex items-center gap-2">
-              <Button onClick={onSave} disabled={!content || saving} className="gap-2" size="sm">
+              <Button variant="outline" onClick={onPreview} className="gap-2" size="sm">
+                <Eye className="h-4 w-4" />
+                <span className="inline">Preview</span>
+              </Button>
+              <Button variant="outline" onClick={onRevert} className="gap-2" size="sm">
+                <Trash2 className="h-4 w-4" />
+                <span className="inline">Revert</span>
+              </Button>
+              <Button onClick={onPublish} disabled={!content || saving || !dirty} className="gap-2" size="sm">
                 <Save className="h-4 w-4" />
-                <span className="inline">{saving ? "Saving" : "Save"}</span>
+                <span className="inline">{saving ? "Publishing" : "Publish"}</span>
               </Button>
               <Button variant="outline" onClick={onLogout} className="gap-2" size="sm">
                 <LogOut className="h-4 w-4" />
@@ -152,8 +292,14 @@ export default function DashboardPage() {
             </div>
           </div>
 
+          {dirty ? (
+            <p className="mt-2 text-xs text-muted-foreground">
+              You have unpublished changes.
+            </p>
+          ) : null}
+
           {/* Mobile nav popup */}
-          <PopupModal open={mobileNav} onClose={() => setMobileNav(false)} title="Navigation">
+          <PopupModal open={mobileNav} onClose={() => setMobileNav(false)} title="Navigation" variant="sidebar">
             <div className="grid gap-1">
               {navItems.map((i) => (
                 <button
@@ -208,16 +354,44 @@ export default function DashboardPage() {
               ) : (
                 <>
                   {section === "services" && (
-                    <ServicesEditor items={content.services} onChange={(next) => setContent({ ...content, services: next })} />
+                    <ServicesEditor
+                      items={content.services}
+                      onChange={(next) => {
+                        setContent({ ...content, services: next });
+                        setDirty(true);
+                        void saveEditableContent({ ...content, services: next });
+                      }}
+                    />
                   )}
                   {section === "stats" && (
-                    <StatsEditor items={content.stats} onChange={(next) => setContent({ ...content, stats: next })} />
+                    <StatsEditor
+                      items={content.stats}
+                      onChange={(next) => {
+                        setContent({ ...content, stats: next });
+                        setDirty(true);
+                        void saveEditableContent({ ...content, stats: next });
+                      }}
+                    />
                   )}
                   {section === "testimonials" && (
-                    <TestimonialsEditor items={content.testimonials} onChange={(next) => setContent({ ...content, testimonials: next })} />
+                    <TestimonialsEditor
+                      items={content.testimonials}
+                      onChange={(next) => {
+                        setContent({ ...content, testimonials: next });
+                        setDirty(true);
+                        void saveEditableContent({ ...content, testimonials: next });
+                      }}
+                    />
                   )}
                   {section === "gallery" && (
-                    <GalleryEditor items={content.gallery} onChange={(next) => setContent({ ...content, gallery: next })} />
+                    <GalleryEditor
+                      items={content.gallery}
+                      onChange={(next) => {
+                        setContent({ ...content, gallery: next });
+                        setDirty(true);
+                        void saveEditableContent({ ...content, gallery: next });
+                      }}
+                    />
                   )}
                 </>
               )}
@@ -226,57 +400,6 @@ export default function DashboardPage() {
         </div>
       </div>
     </AuthGuard>
-  );
-}
-
-/* ------------------------------------------------------------------ */
-/*  Image upload helper                                               */
-/* ------------------------------------------------------------------ */
-function ImageUpload({ value, onChange }: { value: string; onChange: (next: string) => void }) {
-  const inputId = `img-${Math.random().toString(36).slice(2, 8)}`;
-
-  function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = () => {
-      const result = typeof reader.result === "string" ? reader.result : "";
-      if (result) onChange(result);
-    };
-    reader.readAsDataURL(file);
-    e.target.value = ""; // reset so same file can be re-selected
-  }
-
-  return (
-    <div className="grid gap-2">
-      {/* Hidden native input */}
-      <input id={inputId} type="file" accept="image/*" className="hidden" onChange={handleFile} />
-
-      {value ? (
-        <>
-          <div className="overflow-hidden rounded-lg border bg-cream">
-            <img src={value} alt="" className="h-40 w-full object-cover" />
-          </div>
-          <div className="flex gap-2">
-            <Button type="button" variant="outline" size="sm" className="gap-1.5" onClick={() => document.getElementById(inputId)?.click()}>
-              <ImagePlus className="h-3.5 w-3.5" /> Change
-            </Button>
-            <Button type="button" variant="outline" size="sm" className="gap-1.5 text-destructive hover:bg-destructive/10" onClick={() => onChange("")}>
-              <Trash2 className="h-3.5 w-3.5" /> Remove
-            </Button>
-          </div>
-        </>
-      ) : (
-        <button
-          type="button"
-          onClick={() => document.getElementById(inputId)?.click()}
-          className="flex items-center justify-center gap-2 rounded-lg border-2 border-dashed border-border bg-cream p-4 sm:p-6 text-sm text-muted-foreground transition-colors hover:border-primary/40 hover:text-foreground"
-        >
-          <ImagePlus className="h-5 w-5" />
-          Add image
-        </button>
-      )}
-    </div>
   );
 }
 
@@ -313,7 +436,7 @@ function ServicesEditor({ items, onChange }: { items: ServiceItem[]; onChange: (
           </div>
           <div className="grid gap-2">
             <label className="text-sm font-medium">Image</label>
-            <ImageUpload value={draft.imageUrl} onChange={(next) => setDraft({ ...draft, imageUrl: next })} />
+            <CloudinaryUpload value={draft.imageUrl} onChange={(next) => setDraft({ ...draft, imageUrl: next })} />
           </div>
           <div className="grid gap-2">
             <label className="text-sm font-medium">Tag (optional)</label>
@@ -362,7 +485,7 @@ function ServicesEditor({ items, onChange }: { items: ServiceItem[]; onChange: (
                 </div>
                 <div className="mt-3 grid gap-2">
                   <label className="text-xs font-medium text-muted-foreground">Image</label>
-                  <ImageUpload value={s.imageUrl} onChange={(next) => onChange(items.map((x) => (x.id === s.id ? { ...x, imageUrl: next } : x)))} />
+                  <CloudinaryUpload value={s.imageUrl} onChange={(next) => onChange(items.map((x) => (x.id === s.id ? { ...x, imageUrl: next } : x)))} />
                 </div>
               </div>
             ))
@@ -380,6 +503,12 @@ function StatsEditor({ items, onChange }: { items: StatItem[]; onChange: (next: 
   const [open, setOpen] = useState(false);
   const [draft, setDraft] = useState<Omit<StatItem, "id">>({ value: 0, suffix: "+", label: "" });
 
+  // keep numeric value and suffix as separate inputs to avoid editing friction
+  function parseValue(raw: string) {
+    const n = Number(raw);
+    return Number.isFinite(n) ? n : 0;
+  }
+
   return (
     <Card className="bg-cream-deep">
       <CardHeader>
@@ -396,13 +525,15 @@ function StatsEditor({ items, onChange }: { items: StatItem[]; onChange: (next: 
 
       <PopupModal open={open} onClose={() => setOpen(false)} title="New stat" description="Displayed as a large value + label on the website.">
         <div className="grid gap-3">
-          <div className="grid gap-2">
-            <label className="text-sm font-medium">Value</label>
-            <Input type="number" placeholder="e.g. 500" value={draft.value} onChange={(e) => setDraft({ ...draft, value: Number(e.target.value) })} />
-          </div>
-          <div className="grid gap-2">
-            <label className="text-sm font-medium">Suffix</label>
-            <Input placeholder="e.g. +" value={draft.suffix} onChange={(e) => setDraft({ ...draft, suffix: e.target.value })} />
+          <div className="grid gap-2 md:grid-cols-[1fr_auto] md:items-center md:gap-3">
+            <div>
+              <label className="text-sm font-medium">Value</label>
+              <Input placeholder="e.g. 500" inputMode="numeric" value={draft.value ?? 0} onChange={(e) => setDraft({ ...draft, value: parseValue(e.target.value) })} />
+            </div>
+            <div>
+              <label className="text-sm font-medium">Suffix</label>
+              <Input placeholder="e.g. +" value={draft.suffix ?? "+"} onChange={(e) => setDraft({ ...draft, suffix: e.target.value })} />
+            </div>
           </div>
           <div className="grid gap-2">
             <label className="text-sm font-medium">Label</label>
@@ -430,14 +561,23 @@ function StatsEditor({ items, onChange }: { items: StatItem[]; onChange: (next: 
             <p className="text-sm text-muted-foreground">No stats yet.</p>
           ) : (
             items.map((s) => (
-              <div key={s.id} className="grid gap-3 rounded-xl border bg-cream p-4 md:grid-cols-[140px_120px_1fr_auto] md:items-end">
+              <div key={s.id} className="grid gap-3 rounded-xl border bg-cream p-4 md:grid-cols-[220px_1fr_auto] md:items-end">
                 <div className="grid gap-2">
                   <label className="text-xs font-medium text-muted-foreground">Value</label>
-                  <Input type="number" placeholder="0" value={s.value} onChange={(e) => onChange(items.map((x) => (x.id === s.id ? { ...x, value: Number(e.target.value) } : x)))} />
-                </div>
-                <div className="grid gap-2">
-                  <label className="text-xs font-medium text-muted-foreground">Suffix</label>
-                  <Input placeholder="+" value={s.suffix} onChange={(e) => onChange(items.map((x) => (x.id === s.id ? { ...x, suffix: e.target.value } : x)))} />
+                  <div className="flex gap-2">
+                    <Input
+                      placeholder="500"
+                      inputMode="numeric"
+                      value={s.value ?? 0}
+                      onChange={(e) => onChange(items.map((x) => (x.id === s.id ? { ...x, value: parseValue(e.target.value) } : x)))}
+                    />
+                    <Input
+                      placeholder="+"
+                      className="w-24"
+                      value={s.suffix ?? "+"}
+                      onChange={(e) => onChange(items.map((x) => (x.id === s.id ? { ...x, suffix: e.target.value } : x)))}
+                    />
+                  </div>
                 </div>
                 <div className="grid gap-2">
                   <label className="text-xs font-medium text-muted-foreground">Label</label>
@@ -562,7 +702,7 @@ function GalleryEditor({ items, onChange }: { items: GalleryItem[]; onChange: (n
         </div>
       </CardHeader>
 
-      <PopupModal open={open} onClose={() => setOpen(false)} title="New gallery item" description="Prepare fields for your future media/API integration.">
+      <PopupModal open={open} onClose={() => setOpen(false)} title="New gallery item" description="Upload an image and add a title + Description.">
         <div className="grid gap-3">
           <div className="grid gap-2">
             <label className="text-sm font-medium">Title</label>
@@ -570,11 +710,11 @@ function GalleryEditor({ items, onChange }: { items: GalleryItem[]; onChange: (n
           </div>
           <div className="grid gap-2">
             <label className="text-sm font-medium">Image</label>
-            <ImageUpload value={draft.imageUrl} onChange={(next) => setDraft({ ...draft, imageUrl: next })} />
+            <CloudinaryUpload value={draft.imageUrl} onChange={(next) => setDraft({ ...draft, imageUrl: next })} />
           </div>
           <div className="grid gap-2">
-            <label className="text-sm font-medium">Alt text</label>
-            <Input placeholder="Describe the image…" value={draft.alt} onChange={(e) => setDraft({ ...draft, alt: e.target.value })} />
+            <label className="text-sm font-medium">Description</label>
+            <Textarea placeholder="Describe the image…" value={draft.alt} onChange={(e) => setDraft({ ...draft, alt: e.target.value })} />
           </div>
           <div className="flex justify-end pt-2">
             <Button
@@ -584,7 +724,7 @@ function GalleryEditor({ items, onChange }: { items: GalleryItem[]; onChange: (n
                 setDraft({ title: "", imageUrl: "", alt: "" });
                 setOpen(false);
               }}
-              disabled={!draft.title}
+              disabled={!draft.title || !draft.imageUrl}
             >
               Create
             </Button>
@@ -598,23 +738,43 @@ function GalleryEditor({ items, onChange }: { items: GalleryItem[]; onChange: (n
             <p className="text-sm text-muted-foreground sm:col-span-full">No gallery items yet.</p>
           ) : (
             items.map((g) => (
-              <div key={g.id} className="rounded-xl border bg-cream overflow-hidden">
-                {/* Image area */}
-                <div className="aspect-[4/3] bg-cream-deep">
-                  <ImageUpload value={g.imageUrl} onChange={(next) => onChange(items.map((x) => (x.id === g.id ? { ...x, imageUrl: next } : x)))} />
+              <div key={g.id} className="rounded-2xl border bg-cream overflow-hidden shadow-sm">
+                <div className="p-3">
+                  <CloudinaryUpload
+                    value={g.imageUrl}
+                    onChange={(next) =>
+                      onChange(items.map((x) => (x.id === g.id ? { ...x, imageUrl: next } : x)))
+                    }
+                  />
                 </div>
-                {/* Fields */}
-                <div className="p-4 grid gap-3">
+
+                <div className="px-4 pb-4 grid gap-3">
                   <div className="grid gap-1.5">
                     <label className="text-xs font-medium text-muted-foreground">Title</label>
-                    <Input placeholder="Item title" value={g.title} onChange={(e) => onChange(items.map((x) => (x.id === g.id ? { ...x, title: e.target.value } : x)))} />
+                    <Input
+                      placeholder="Item title"
+                      value={g.title}
+                      onChange={(e) => onChange(items.map((x) => (x.id === g.id ? { ...x, title: e.target.value } : x)))}
+                    />
                   </div>
                   <div className="grid gap-1.5">
-                    <label className="text-xs font-medium text-muted-foreground">Alt text</label>
-                    <Input placeholder="Describe the image…" value={g.alt} onChange={(e) => onChange(items.map((x) => (x.id === g.id ? { ...x, alt: e.target.value } : x)))} />
+                    <label className="text-xs font-medium text-muted-foreground">Description</label>
+                    <Textarea
+                      placeholder="Describe the image…"
+                      value={g.alt}
+                      onChange={(e) => onChange(items.map((x) => (x.id === g.id ? { ...x, alt: e.target.value } : x)))}
+                    />
                   </div>
-                  <div className="flex justify-end pt-1">
-                    <Button type="button" variant="destructive" size="sm" onClick={() => onChange(items.filter((x) => x.id !== g.id))}>
+
+                  <div className="flex items-center justify-between pt-1">
+                    <span className="text-[11px] uppercase tracking-[0.18em] text-muted-foreground">Gallery item</span>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      className="text-destructive hover:bg-destructive/10"
+                      onClick={() => onChange(items.filter((x) => x.id !== g.id))}
+                    >
                       Remove
                     </Button>
                   </div>

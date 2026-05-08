@@ -121,14 +121,16 @@ export default function Contact() {
               <div className="mt-12">
                 <p className="text-xs uppercase tracking-[0.2em] text-cream/60">Follow us</p>
                 <div className="mt-3 flex gap-2">
-                  {[InstagramIcon, FacebookIcon, LinkedinIcon, TwitterIcon].map((Icon, i) => (
+                  {[{icon:InstagramIcon, link:'https://www.instagram.com/rentsmiths'}, {icon:FacebookIcon, link:"https://www.facebook.com/rentsmithsglobaleducarionconsult"}, {icon:LinkedinIcon, link:"https://www.linkedin.com/in/tope-akinwumi-22963046"}].map((e, i) => (
                     <a
                       key={i}
-                      href="#"
+                      href={e.link}
                       className="grid h-10 w-10 place-items-center rounded-full border border-cream/15 transition-colors hover:bg-primary hover:border-transparent"
                       aria-label="social"
+                      target="_blank"
+                      rel="noopener noreferrer"
                     >
-                      <Icon className="h-4 w-4" />
+                      <e.icon className="h-4 w-4" />
                     </a>
                   ))}
                 </div>

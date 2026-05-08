@@ -7,6 +7,7 @@ import Footer from "@/components/site/Footer";
 import { Testimonials } from "@/components/site/Testimonials";
 import { CtaBand } from "@/components/site/CtaBand";
 import CursorFollower from "@/components/ui/CursorFollower";
+import { PreviewBar } from "@/components/site/PreviewBar";
 
 export function SiteChrome({ children }: { children: ReactNode }) {
   const pathname = usePathname();
@@ -18,6 +19,7 @@ export function SiteChrome({ children }: { children: ReactNode }) {
 
   return (
     <>
+      <PreviewBar />
       <Header />
       {children}
       <Testimonials />
