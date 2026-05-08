@@ -1,3 +1,4 @@
+"use client"
 import { Reveal } from "./Reveal";
 import { useSiteContent } from "@/components/site/SiteContentProvider";
 
