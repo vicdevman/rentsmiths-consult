@@ -4,17 +4,42 @@ import { motion, useScroll, useTransform } from "framer-motion";
 import { ArrowUpRight, Star } from "lucide-react";
 import Link from "next/link";
 import { useRef } from "react";
+import Image from "next/image";
 import heroBg from "@/assets/hero-bg.jpg";
 import CircularText from '../CircularText';
+import g1 from "@/assets/gallery-1.jpg";
+import g2 from "@/assets/gallery-2.jpg";
+import g3 from "@/assets/gallery-3.jpg";
+import g4 from "@/assets/gallery-4.jpg";
+import g5 from "@/assets/gallery-5.jpg";
+import g6 from "@/assets/gallery-6.jpg";
+import { useSiteContent } from "@/components/site/SiteContentProvider";
+
+const fallbackGallery = [
+  { img: g1.src, title: "Class of 2024" },
+  { img: g2.src, title: "Visa Approval Day" },
+  { img: g3.src, title: "Campus Life Begins" },
+  { img: g4.src, title: "Departure Lounge" },
+  { img: g5.src, title: "1:1 CV Reviews" },
+  { img: g6.src, title: "Pre-Departure Workshop" },
+];
 
 export function Hero() {
   const ref = useRef<HTMLDivElement>(null);
+  const galleryScrollRef = useRef<HTMLDivElement>(null);
+  const { content } = useSiteContent();
   const { scrollYProgress } = useScroll({
     target: ref,
     offset: ["start start", "end start"],
   });
   const y = useTransform(scrollYProgress, [0, 1], [0, 120]);
   const scale = useTransform(scrollYProgress, [0, 1], [1, 1.12]);
+
+  const fromDb = (content?.gallery ?? []).map((g) => ({
+    img: g.imageUrl || g1.src,
+    title: g.title || g.alt || "Event",
+  }));
+  const galleryItems = (fromDb.length ? fromDb : fallbackGallery).slice(0, 8);
 
   return (
     <section
@@ -81,6 +106,67 @@ export function Hero() {
           A quest for quality global education and unparalleled career
           opportunities. We guide you every step of the way.
         </motion.p>
+
+        <motion.div
+          initial={{ opacity: 0, y: 14 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, delay: 0.62 }}
+          className="mx-auto mt-10 max-w-5xl"
+        >
+          <div className="flex items-center justify-between gap-4">
+            <p className="text-xs uppercase tracking-[0.28em] text-foreground/70">
+              Recent events
+            </p>
+            <Link
+              href="/gallery"
+              className="text-xs font-semibold text-primary hover:underline"
+              data-cursor="interactive"
+              data-cursor-scale="1.2"
+            >
+              View all
+            </Link>
+          </div>
+
+          <div className="relative mt-3">
+            <div className="pointer-events-none absolute inset-y-0 left-0 w-10 bg-gradient-to-r from-[var(--cream)] to-transparent" />
+            <div className="pointer-events-none absolute inset-y-0 right-0 w-10 bg-gradient-to-l from-[var(--cream)] to-transparent" />
+            <div
+              ref={galleryScrollRef}
+              onWheel={(e) => {
+                const el = galleryScrollRef.current;
+                if (!el) return;
+                if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
+                  e.preventDefault();
+                  el.scrollLeft += e.deltaY;
+                }
+              }}
+              className="flex snap-x snap-mandatory gap-4 overflow-x-auto pb-2 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+            >
+              {galleryItems.map((it, i) => (
+                <div
+                  key={`${it.title}-${i}`}
+                  className="snap-start shrink-0 w-[220px] sm:w-[260px]"
+                >
+                  <div className="group overflow-hidden rounded-2xl border border-primary/10 bg-primary/5 backdrop-blur-md">
+                    <div className="relative aspect-[16/10]">
+                      <Image
+                        src={it.img}
+                        alt={it.title}
+                        fill
+                        sizes="(max-width: 640px) 220px, 260px"
+                        className="object-cover transition-transform duration-700 group-hover:scale-105"
+                        priority={i < 2}
+                      />
+                    </div>
+                    <div className="px-3 py-2">
+                      <p className="truncate text-xs font-medium text-foreground/80">{it.title}</p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </motion.div>
 
         <motion.div
           initial={{ opacity: 0, y: 14 }}
